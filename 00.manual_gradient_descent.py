@@ -24,6 +24,7 @@ class ManualGradientDescent(object):
         train_data = []
         for i in range(total):
             x = random.random()
+            # 定义一个函数集合
             y = w * x ** 2 + b * x
             # y = w * x + b
             train_data.append((x, y))
@@ -40,18 +41,22 @@ class ManualGradientDescent(object):
                          ephocs=1000,
                          lr=0.0000001):
         """
-        loss   => (w * x ** 2 + b * x - y) ** 2
-        w_grad => 2.0 * (w * x ** 2 + b * x - y) * (x ** 2)
-        b_grad => 2.0 * (w * x ** 2 + b * x - y) * (x)
+        梯度下降
+
+        loss   => (w * x ** 2 + b * x - y) ** 2 # 定义一个损失函数
+        w_grad => 2.0 * (w * x ** 2 + b * x - y) * (x ** 2) # 针对 w 求导
+        b_grad => 2.0 * (w * x ** 2 + b * x - y) * (x) # 针对 b 求导
         """
         print("Original Radom w & b => ({w}, {b})".format(w=w, b=b))
         for i in range(ephocs):
             for x, y in train_data:
+                # 根据链式法则，针对参数对损失函数求导
                 w_grad = 2.0 * (w * x ** 2 + b * x - y) * (x ** 2)
                 b_grad = 2.0 * (w * x ** 2 + b * x - y) * (x)
                 # w_grad = 2.0 * (w * x + b - y) * x
                 # b_grad = 2.0 * (w * x + b - y)
 
+                # 更新参数（优化，如何找到局部最优/全局最优?）
                 w = self.update_param(w, lr, w_grad)
                 b = self.update_param(b, lr, b_grad)
 
