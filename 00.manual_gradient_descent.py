@@ -70,3 +70,11 @@ if __name__ == "__main__":
     train_data = mgd.generate_train_data(w, b, 1000)
     _w, _b = mgd.gradient_descent(train_data, ephocs=1000, lr=0.001)
     print("Predict w & b => ({w}, {b})".format(w=_w, b=_b))
+
+    """
+    - TODO
+    - 小批量随机梯度
+    - 噪音
+    - 激活函数
+    - 优化函数
+    """
