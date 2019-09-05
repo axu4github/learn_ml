@@ -1,4 +1,7 @@
 import random
+import logging as logger
+
+logger.basicConfig(format="%(levelname)s %(message)s", level=logger.DEBUG)
 
 
 class ManualGradientDescent(object):
@@ -34,6 +37,10 @@ class ManualGradientDescent(object):
     def update_param(self, param, lr, grad):
         return param - lr * grad
 
+    def loss(self, yhat, y):
+        """ 损失函数 """
+        return (yhat - y) ** 2
+
     def gradient_descent(self,
                          train_data,
                          w=random.random(),
@@ -47,7 +54,7 @@ class ManualGradientDescent(object):
         w_grad => 2.0 * (w * x ** 2 + b * x - y) * (x ** 2) # 针对 w 求导
         b_grad => 2.0 * (w * x ** 2 + b * x - y) * (x) # 针对 b 求导
         """
-        print("Original Radom w & b => ({w}, {b})".format(w=w, b=b))
+        logger.info("Original Radom w & b => ({w}, {b})".format(w=w, b=b))
         for i in range(ephocs):
             for x, y in train_data:
                 # 根据链式法则，针对参数对损失函数求导
@@ -60,16 +67,21 @@ class ManualGradientDescent(object):
                 w = self.update_param(w, lr, w_grad)
                 b = self.update_param(b, lr, b_grad)
 
+            # 输出损失
+            _loss = self.loss(w * x ** 2 + b * x, y)
+            logger.debug("Ephoc => {ephoc}, Loss => {loss}".format(
+                ephoc=i + 1, loss=round(_loss, 10)))
+
         return (w, b)
 
 
 if __name__ == "__main__":
     mgd = ManualGradientDescent()
     (w, b) = mgd.generate_w_b()
-    print("Correct w & b => ({w}, {b})".format(w=w, b=b))
+    logger.info("Correct w & b => ({w}, {b})".format(w=w, b=b))
     train_data = mgd.generate_train_data(w, b, 1000)
-    _w, _b = mgd.gradient_descent(train_data, ephocs=1000, lr=0.001)
-    print("Predict w & b => ({w}, {b})".format(w=_w, b=_b))
+    _w, _b = mgd.gradient_descent(train_data, ephocs=5, lr=0.1)
+    logger.info("Predict w & b => ({w}, {b})".format(w=_w, b=_b))
 
     """
     - TODO
