@@ -1,8 +1,10 @@
 import random
 import logging as logger
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 
-logger.basicConfig(format="%(levelname)s %(message)s", level=logger.DEBUG)
+logger.basicConfig(format="%(levelname)s %(message)s", level=logger.INFO)
 
 
 class ComplexFunction(object):
@@ -26,9 +28,12 @@ class ComplexFunction(object):
 
     def generate_train_data(self, w, b, total=1000):
         """ 生成训练数据 """
-        train_data = []
+        train_data, xs = [], []
         for i in range(total):
-            x = random.random()
+            xs.append(random.random())
+
+        xs = sorted(xs)
+        for x in xs:
             # 定义一个函数集合
             y = w * x ** 2 + b * x
             # y = w * x + b
@@ -61,8 +66,8 @@ class ComplexFunction(object):
         logger.info("Original Radom w & b => ({w3}, {w2}, {w1}, {b})".format(
             w3=w3, w2=w2, w1=w1, b=b))
         for i in range(ephocs):
-        # i = 0
-        # while True:
+            # i = 0
+            # while True:
             w3_lr, w2_lr, w1_lr, b_lr = 0, 0, 0, 0
             for x, y in train_data:
                 # 根据链式法则，针对参数对损失函数求导
@@ -88,12 +93,12 @@ class ComplexFunction(object):
                 b = self.update_param(b, lr / math.sqrt(b_lr), b_grad)
 
             # 输出损失
-            _loss = self.loss(w2 * x ** 3 + w2 * x ** 2 + w1 * x + b, y)
-            logger.debug("Ephoc => {ephoc}, Loss => {loss}, params => ({w3}, {w2}, {w1}, {b})".format(
+            _loss = self.loss(w3 * x ** 3 + w2 * x ** 2 + w1 * x + b, y)
+            logger.info("Ephoc => {ephoc}, Loss => {loss}, params => ({w3}, {w2}, {w1}, {b})".format(
                 ephoc=i + 1, loss=round(_loss, 10), w3=w3, w2=w2, w1=w1, b=b))
 
-            if _loss < 0.00000000001:
-                break
+            # if _loss < 0.000001:
+            #     break
 
             # i += 1
 
@@ -103,12 +108,19 @@ class ComplexFunction(object):
 if __name__ == "__main__":
     cf = ComplexFunction()
     (w, b) = cf.generate_random_params()
-    train_data = cf.generate_train_data(w, b, 100000)
-    w3, w2, w1, _b = cf.gradient_descent(train_data, ephocs=50, lr=0.0001)
-    logger.info("Correct w & b => ({w}, {b})".format(w=w, b=b))
-    logger.info("Predict w3, w2, w1, b => ({w3}, {w2}, {w1}, {b})".format(
-        w3=w3, w2=w2, w1=w1, b=_b))
+    for i in range(10):
+        train_data = cf.generate_train_data(w, b, 100000)
+        print(train_data[0:10])
+        w3, w2, w1, _b = cf.gradient_descent(train_data, ephocs=1, lr=0.000001)
+        logger.info("Correct w & b => ({w}, {b})".format(w=w, b=b))
+        logger.info("Predict w3, w2, w1, b => ({w3}, {w2}, {w1}, {b})".format(
+            w3=w3, w2=w2, w1=w1, b=_b))
 
+        x = np.linspace(-1000, 1000)
+        y = w3 * x ** 3 + w2 * x ** 2 + w1 * x + b
+
+        plt.plot(x, y)
+    plt.show()
     """
     - TODO
     - 小批量随机梯度
